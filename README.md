@@ -1,10 +1,10 @@
 # inde1-harmonyland
 
 ## Versions
-Scala 2.13.9
-sbt 1.8.2
-Open JDK 11.0.2
-Spark 2.4.7
+ - Scala 2.13.9
+ - sbt 1.8.2
+ - Open JDK 11.0.2
+ - Spark 2.4.7
 
 ## Harmony Poc
 The goal is to write a poc demonstrating a working architecture of harmonystate.
