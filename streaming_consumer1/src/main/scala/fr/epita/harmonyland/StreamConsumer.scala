@@ -18,12 +18,10 @@ object StreamConsumer extends App{
   }
 
   val builder = new StreamsBuilder
-  val textLines: KStream[String, String] = builder.stream[String, String]("global1")
+  val sources: KStream[String, String] = builder.stream[String, String]("global1")
 
-  val uppercasedWithMapValues: KStream[String, String] = textLines.mapValues(_.toUpperCase())
-  uppercasedWithMapValues.to("UppercasedTextLinesTopic")
-
-  uppercasedWithMapValues.to("alert")
+  val alerts: KStream[String, String] = sources.filter((_, value) => value.contains("alert"))
+  alerts.to("alert")
 
   val streams: KafkaStreams = new KafkaStreams(builder.build(), config)
   streams.start()
