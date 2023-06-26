@@ -2,11 +2,11 @@ name := "Alert Stream Consumer"
 
 version := "1.0"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.11.12"
 
 libraryDependencies ++= Seq(
-  "org.apache.kafka" % "kafka-clients" % "3.5.0",
-  "org.apache.kafka" % "kafka-clients" % "3.2.0",
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+  "org.apache.kafka" % "kafka-clients" % "2.3.0",
+  "org.apache.kafka" % "kafka-streams" % "2.3.0",
+  "org.apache.kafka" %% "kafka-streams-scala" % "2.3.0"
 )
 

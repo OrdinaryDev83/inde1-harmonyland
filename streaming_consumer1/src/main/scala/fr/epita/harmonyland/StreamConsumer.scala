@@ -1,23 +1,32 @@
 package fr.epita.harmonyland
 
-import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
-import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
+import org.apache.kafka.streams.scala.ImplicitConversions._
+import org.apache.kafka.streams.scala.Serdes._
+import org.apache.kafka.streams.scala.StreamsBuilder
+import org.apache.kafka.streams.scala.kstream.KStream
 
-import scala.collection.JavaConverters._
-
+import java.time.Duration
 import java.util.Properties
 
 object StreamConsumer extends App{
-  val props: Properties = new Properties()
-  props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
-  props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, classOf[StringDeserializer])
-  props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, classOf[StringDeserializer])
-  props.put(ConsumerConfig.GROUP_ID_CONFIG, "streamConsumer1")
+  val config: Properties = {
+    val props = new Properties()
+    props.put(StreamsConfig.APPLICATION_ID_CONFIG, "map-function-scala-example")
+    props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+    props
+  }
 
-  val consumer: KafkaConsumer[String, String] = new KafkaConsumer[String, String](props)
+  val builder = new StreamsBuilder
+  val sources: KStream[String, String] = builder.stream[String, String]("global1")
 
-  consumer.subscribe(List("principal_topic").asJava)
+  val alerts: KStream[String, String] = sources.filter((_, value) => value.contains("alert"))
+  alerts.to("alert")
 
-  // Consumer only the message that are doesn't contain the word "test"
-  
+  val streams: KafkaStreams = new KafkaStreams(builder.build(), config)
+  streams.start()
+
+  sys.ShutdownHookThread {
+    streams.close(Duration.ofSeconds(10))
+  }
 }
