@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder
 
 import java.util.concurrent.{Executors, TimeUnit}
 
-object Main extends App {
+object Main {
   private val gson = new GsonBuilder().setPrettyPrinting().create()
   private val scheduler = Executors.newScheduledThreadPool(1)
 
@@ -16,7 +16,7 @@ object Main extends App {
         .foreach(println)
     },
     0,
-    1,
-    TimeUnit.MINUTES
+    10,
+    TimeUnit.SECONDS
   )
 }
