@@ -1,5 +1,8 @@
 *.class
 *.log
+.bsp/
+.metals/
+.vscode/
 build.sbt_back
 
 # sbt specific
