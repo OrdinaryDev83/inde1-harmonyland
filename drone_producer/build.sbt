@@ -9,7 +9,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql" % "2.4.8" % "provided",
   "org.apache.kafka" % "kafka-clients" % "3.5.0",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.5",
-  "com.google.code.gson" % "gson" % "2.7",
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+  "net.liftweb" %% "lift-json" % "3.4.3"
 )
 

@@ -6,12 +6,17 @@ import scala.util.Random
 
 object Simulation {
   def generateReport(droneId: Int): Report = {
+    val n = (scala.util.Random.nextInt(10) + 1)
+    val personsAndWords = List.fill(n)(generatePersonAndWords())
+    val persons = personsAndWords.map(_._1)
+    val words = personsAndWords.map(_._2)
+    val surrounding = generateSurrounding(words)
     Report(
       droneId,
       generateRandomLongitude(),
       generateRandomLatitude(),
-      generateSurrounding(),
-      generateWords(),
+      persons,
+      surrounding,
       new Date()
     )
   }
@@ -24,12 +29,25 @@ object Simulation {
     scala.util.Random.nextDouble() * 360 - 180
   }
 
-  private def generateWords(): List[String] = {
-    List.fill(scala.util.Random.nextInt(10))(scala.util.Random.nextPrintableChar().toString)
+  private def generateWordsAndScore(): (List[String], Int) = {
+    // get a random number of words
+    val n = scala.util.Random.nextInt(10) + 1
+    val tuples = List.fill(n)(scala.util.Random.shuffle(this.words).head)
+    // calculate average of the words
+    val average = {
+      val numbers = tuples.collect {
+        case (_, str) if str.matches("-?\\d+(\\.\\d+)?") => str.toDouble
+      }
+      numbers.sum / numbers.length
+    }
+
+    // return the words and the average
+    (tuples.map(_._1), average.toInt)
   }
 
-  private def generateSurrounding(): List[Person] = {
-    List.fill(scala.util.Random.nextInt(10))(generatePerson())
+  private def generateSurrounding(words : List[List[String]]): List[String] = {
+    // concat all the words said by each person
+    words.flatten
   }
 
   private def read_csv(filePath : String) : List[(String, String)] = {
@@ -45,17 +63,19 @@ object Simulation {
   }
 
   private val names = read_csv("data/names.csv")
+  private val words = read_csv("data/words.csv")
 
-  private def generatePerson(): Person = {
+  private def generatePersonAndWords(): (Person, List[String]) = {
     val personName = Random.shuffle(names).head
-    Person(personName._1, personName._2, generateScore())
-  }
-
-  private def generateScore(): Int = {
-    scala.util.Random.nextInt(11)
+    val tuple = generateWordsAndScore()
+    (Person(personName._1, personName._2, tuple._2), tuple._1)
   }
 
   case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date)
 
-  case class Person(firstName: String, lastName: String, harmonyScore: Int)
+  case class Person(firstName: String, lastName: String, harmonyScore: Int) {
+    override def toString: String = {
+      s"$firstName $lastName: $harmonyScore"
+    }
+  }
 }
