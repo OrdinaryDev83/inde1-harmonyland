@@ -1,13 +1,10 @@
 package fr.epita.harmonyland
 
 import ackcord._
-import ackcord.data.{ChannelId, GuildId, NormalTextGuildChannel, TextChannelId, TextGuildChannel}
-import ackcord.interactions.InteractionsRegistrar
-import ackcord.requests.{CreateMessage, CreateMessageData}
-import ackcord.syntax.{ChannelSyntax, GatewayGuildSyntax, TextChannelSyntax}
 import io.github.cdimascio.dotenv.Dotenv
 
-import scala.concurrent.{Await, ExecutionContext}
+import java.util.concurrent.{CountDownLatch, Executors, TimeUnit}
+import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, SECONDS}
 import scala.sys.env
 

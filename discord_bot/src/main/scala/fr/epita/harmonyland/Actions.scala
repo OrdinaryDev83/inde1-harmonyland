@@ -1,16 +1,14 @@
 package fr.epita.harmonyland
 
-import ackcord.EventListenerMessage.findCache
 import ackcord._
-import ackcord.commands.CommandMessage.findCache
 import ackcord.data._
 import ackcord.requests._
-import ackcord.syntax._
-import akka.stream.Client
-import fr.epita.harmonyland.Main.{client, dotenv}
 import io.github.cdimascio.dotenv.Dotenv
+import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecords, KafkaConsumer}
+import org.apache.kafka.common.serialization.StringDeserializer
 
-import scala.concurrent.ExecutionContext
+import java.util.Properties
+import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, seqAsJavaListConverter}
 
 object Actions {
   def sendMessage(dotenv : Dotenv, client: DiscordClient, message: String): Unit = {
