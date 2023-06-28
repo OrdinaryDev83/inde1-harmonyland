@@ -4,7 +4,7 @@ services:
     image: cassandra:latest
     ports:
       - 9042:9042
-    user: cassandra
+    privileged: true
     volumes:
       - /var/lib/cassandra
       - ./cassandra/harmonyStateCreate.cql:/schema.cql
