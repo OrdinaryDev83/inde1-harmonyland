@@ -1,4 +1,4 @@
-CREATE KEYSPACE HarmonyState
+CREATE KEYSPACE IF NOT EXISTS HarmonyState
     WITH REPLICATION = {
         'class' : 'SimpleStrategy',
         'replication_factor' : 1
@@ -6,8 +6,9 @@ CREATE KEYSPACE HarmonyState
 
 USE HarmonyState;
 
-CREATE TABLE Report (
+CREATE TABLE IF NOT EXISTS Report (
     id int,
+    droneId int,
     longitude double,
     latitude double,
     persons list<tuple<text, text>>,
@@ -16,7 +17,7 @@ CREATE TABLE Report (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE Person (
+CREATE TABLE IF NOT EXISTS Person (
     id int,
     name text,
     surname text,
@@ -24,3 +25,4 @@ CREATE TABLE Person (
     PRIMARY KEY (id)
 );
 
+//CREATE ROLE IF NOT EXISTS grafana WITH SUPERUSER = true AND LOGIN = true AND PASSWORD = 'bacon';

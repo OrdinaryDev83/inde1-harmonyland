@@ -1,15 +1,11 @@
 package fr.epita.harmonyland
 
 import ackcord._
-import ackcord.data.{ChannelId, GuildId, NormalTextGuildChannel, TextChannelId, TextGuildChannel}
-import ackcord.interactions.InteractionsRegistrar
-import ackcord.requests.{CreateMessage, CreateMessageData}
-import ackcord.syntax.{ChannelSyntax, GatewayGuildSyntax, TextChannelSyntax}
 import io.github.cdimascio.dotenv.Dotenv
 
-import scala.concurrent.{Await, ExecutionContext}
+import java.util.concurrent.{CountDownLatch, Executors, TimeUnit}
+import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, SECONDS}
-import scala.sys.env
 
 object Main extends App {
   // load .env file
@@ -22,11 +18,41 @@ object Main extends App {
   //In real code, please dont block on the client construction
   val client = Await.result(clientSettings.createClient(), Duration(10, SECONDS))
 
-  //The client also contains an execution context
-  //import client.executionContext
-
   client.login()
   println("[HARMONYSOFT] Logged in")
-  Actions.sendMessage(dotenv, client, ":green_circle: Online")
-  println("[HARMONYSOFT] Online")
+
+  client.onEventSideEffects {
+    implicit c => {
+      case msg: APIMessage.GuildCreate => {
+        // The client also contains an execution context
+        //import client.executionContext
+        Actions.sendMessage(msg.cache.current, dotenv, client, ":green_circle: Online")
+        println("[HARMONYSOFT] Online")
+
+        val consumer = Actions.build_consumer()
+
+        println("[HARMONYSOFT] Listening to the Alert topic")
+
+        val scheduler = Executors.newScheduledThreadPool(1)
+        val task = new Runnable {
+          def run(): Unit = {
+            Actions.poll(dotenv, client, msg, consumer)
+          }
+        }
+        scheduler.scheduleAtFixedRate(
+          task,
+          0,
+          2,
+          TimeUnit.SECONDS
+        )
+        // Keep the main thread alive
+        val latch = new CountDownLatch(1)
+
+        latch.await()
+
+        scheduler.shutdown()
+        consumer.close()
+      }
+    }
+  }
 }
