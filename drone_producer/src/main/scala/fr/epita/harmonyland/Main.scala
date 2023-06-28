@@ -14,7 +14,7 @@ object Main extends App {
   scheduler.scheduleAtFixedRate(
     () => {
       implicit val formats = DefaultFormats
-      val json_list = List.range(0, 10)
+      val json_list = List.range(0, 100)
         .map(Simulation.generateReport)
         .map((report) => {
           val json = write(report)

@@ -1,4 +1,4 @@
-name := "Harmonyland"
+name := "Drone Producer"
 
 version := "1.0"
 
