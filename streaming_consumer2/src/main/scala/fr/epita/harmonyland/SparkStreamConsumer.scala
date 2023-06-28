@@ -1,49 +1,51 @@
 package fr.epita.harmonyland
 
-import com.datastax.spark.connector.SomeColumns
-import org.apache.kafka.common.serialization.StringDeserializer
+import com.datastax.spark.connector.CassandraSparkExtensions
 import org.apache.spark.SparkConf
-import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
-import org.apache.spark.streaming.kafka010.KafkaUtils
-import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
-import org.apache.spark.streaming.{Seconds, StreamingContext}
-import com.datastax.spark.connector.streaming._
-import com.google.gson.GsonBuilder
+import org.apache.spark.sql.cassandra.DataFrameWriterWrapper
+import org.apache.spark.sql.{Encoders, SparkSession}
+
+import java.util.Date
 
 object SparkStreamConsumer{
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf()
+    val config = new SparkConf()
       .setMaster("local[*]")
       .setAppName("SparkStreamConsumer")
       .set("spark.cassandra.connection.host", "127.0.0.1")
       .set("spark.sql.extensions", "com.datastax.spark.connector.CassandraSparkExtensions")
 
-    val ssc = new StreamingContext(conf, Seconds(10))
+    val spark = SparkSession.builder
+      .config(config)
+      .withExtensions(new CassandraSparkExtensions)
+      .getOrCreate()
 
-    val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "localhost:9092",
-      "key.deserializer" -> classOf[StringDeserializer],
-      "value.deserializer" -> classOf[StringDeserializer],
-      "group.id" -> "sparkStreamGroup",
-      "auto.offset.reset" -> "latest"
-    )
+    val df = spark
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "localhost:9092")
+      .option("startingOffsets", "earliest")
+      .option("subscribe", "global1")
+      .load()
 
-    val topics = List("global2")
-    val stream = KafkaUtils.createDirectStream[String, String](
-      ssc,
-      PreferConsistent,
-      Subscribe[String, String](topics, kafkaParams)
-    )
+    case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date)
+    case class Person(firstName: String, lastName: String, harmonyScore: Int) {
+      override def toString: String = {
+        s"$firstName $lastName: $harmonyScore"
+      }
+    }
 
-    val gson = new GsonBuilder().setPrettyPrinting().create()
-    stream.map(records => records.value())
-      .map(x => gson.toJson(x))
-      .print()
-    // saveToCassandra("harmonystate", "report", SomeColumns("latitude", "longitude"))
+    //val reportSchema = Encoders.product[Report].schema
+    df.select("value")
 
-    ssc.start()
-    ssc.awaitTermination()
+    df.writeStream
+      .foreachBatch { (batchDF, batchId) =>
+        batchDF.write
+          .cassandraFormat("person", "harmonystate")
+          .mode("append")
+          .save()
+      }
+      .start()
+      .awaitTermination()
   }
-
-
 }
