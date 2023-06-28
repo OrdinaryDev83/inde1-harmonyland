@@ -1,0 +1,42 @@
+version: '3.5'
+services:
+  cassandra:
+    image: cassandra:latest
+    ports:
+      - 9042:9042
+    privileged: true
+    volumes:
+      - /var/lib/cassandra
+      - ./cassandra/harmonyStateCreate.cql:/schema.cql
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - /var/lib/grafana
+    networks:
+      - backend
+    depends_on:
+      - cassandra
+
+  # cassandra-load-keyspace:
+  #   container_name: cassandra-load-keyspace
+  #   image: cassandra:latest
+  #   depends_on:
+  #     cassandra :
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./harmonyStateCreate.cql:/schema.cql
+  #   networks:
+  #     - backend
+
+networks:
+  backend:
