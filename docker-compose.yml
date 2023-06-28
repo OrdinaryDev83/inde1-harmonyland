@@ -4,6 +4,7 @@ services:
     image: cassandra:latest
     ports:
       - 9042:9042
+    privileged: true
     volumes:
       - /var/lib/cassandra
       - ./cassandra/harmonyStateCreate.cql:/schema.cql
@@ -26,16 +27,15 @@ services:
     depends_on:
       - cassandra
 
-  # cassandra-load-keyspace:
-  #   container_name: cassandra-load-keyspace
-  #   image: cassandra:latest
-  #   depends_on:
-  #     cassandra :
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./harmonyStateCreate.cql:/schema.cql
-  #   networks:
-  #     - backend
+  cassandra-load-keyspace:
+    container_name: cassandra
+    image: cassandra:latest
+    depends_on:
+      cassandra :
+        condition: service_healthy
+    # command: cqlsh -f /schema.cql
+    networks:
+      - backend
 
 networks:
   backend:
