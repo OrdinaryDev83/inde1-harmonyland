@@ -10,11 +10,6 @@ services:
       - ./cassandra/harmonyStateCreate.cql:/schema.cql
     networks:
       - backend
-    healthcheck:
-      test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
 
   grafana:
     image: grafana/grafana:latest
@@ -26,16 +21,6 @@ services:
       - backend
     depends_on:
       - cassandra
-
-  cassandra-load-keyspace:
-    container_name: cassandra
-    image: cassandra:latest
-    depends_on:
-      cassandra :
-        condition: service_healthy
-    # command: cqlsh -f /schema.cql
-    networks:
-      - backend
 
 networks:
   backend:
