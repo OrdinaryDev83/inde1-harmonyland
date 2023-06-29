@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS report (
     latitude double,
     persons frozen<list<person>>,
     words list<text>,
-    time date,
+    time timestamp,
     PRIMARY KEY (droneid, time)
 );
 
