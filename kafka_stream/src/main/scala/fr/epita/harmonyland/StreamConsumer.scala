@@ -21,7 +21,7 @@ object StreamConsumer extends App{
   val sources: KStream[String, String] = builder.stream[String, String]("global1")
 
   val badScorePattern = "\"harmonyscore\":(0|1)(?![0-9])".r
-  val alerts: KStream[String, String] = sources.filter((_, value) => badScorePattern.r.findFirstIn(value).isDefined)
+  val alerts: KStream[String, String] = sources.filter((_, value) => badScorePattern.findFirstIn(value).isDefined)
   alerts.to("alert")
 
   val streams: KafkaStreams = new KafkaStreams(builder.build(), config)
