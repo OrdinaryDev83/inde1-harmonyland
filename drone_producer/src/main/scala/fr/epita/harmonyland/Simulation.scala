@@ -30,8 +30,11 @@ object Simulation {
     scala.util.Random.nextDouble() * 360 - 180
   }
 
-  private def getARandomWord(harmonyScore : Int) : (String, String) = {
-    val words = this.words.filter(_._2.toInt == harmonyScore)
+  private def getARandomWord(harmonyScore : Int) : (String, Int) = {
+    val words_converted = this.words.collect {
+      case (a, str) if str.matches("-?\\d+(\\.\\d+)?") => (a, str.toInt)
+    }
+    val words = words_converted.filter(_._2 == harmonyScore)
     words(Random.nextInt(words.length))
   }
 
@@ -49,11 +52,8 @@ object Simulation {
     val n = scala.util.Random.nextInt(10) + 1
     val tuples = List.fill(n)(getARandomWord(randomHarmonyScore()))
     // calculate average of the words
-    val tuples2 = tuples.collect {
-      case (a, str) if str.matches("-?\\d+(\\.\\d+)?") => (a, str.toInt)
-    }
-    val numbers = tuples2.map(_._2).map(x => x.toDouble)
-    (tuples2, (numbers.sum / numbers.length).toInt)
+    val numbers = tuples.map(_._2).map(x => x.toDouble)
+    (tuples, (numbers.sum / numbers.length).toInt)
   }
 
   private def generateSurrounding(words : List[List[(String, Int)]]): List[String] = {
