@@ -71,11 +71,11 @@ object Simulation {
     (Person(personName._1, personName._2, tuple._2), tuple._1)
   }
 
-  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date)
+  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date) extends Product with Serializable
 
-  case class Person(firstName: String, lastName: String, harmonyScore: Int) {
+  case class Person(firstname: String, lastname: String, harmonyscore: Int) extends Product with Serializable{
     override def toString: String = {
-      s"$firstName $lastName: $harmonyScore"
+      s"$firstname $lastname: $harmonyscore"
     }
   }
 }
