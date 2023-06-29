@@ -24,6 +24,7 @@ libraryDependencies += "com.sedmelluq" % "lavaplayer" % "1.3.77"
 assembly / assemblyJarName := "discord-bot-fatjar-1.0.jar"
 
 assembly / assemblyMergeStrategy := {
- case PathList("META-INF", _*) => MergeStrategy.discard
- case _                        => MergeStrategy.first
+    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+    case "reference.conf" => MergeStrategy.concat
+    case _ => MergeStrategy.first
 }
