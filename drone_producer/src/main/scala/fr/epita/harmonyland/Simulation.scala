@@ -1,9 +1,8 @@
 package fr.epita.harmonyland
 
+import java.sql.Timestamp
 import java.util.Date
 import scala.io.Source
-import scala.math.Fractional.Implicits.infixFractionalOps
-import scala.math.Numeric.IntIsIntegral.mkNumericOps
 import scala.util.Random
 
 object Simulation {
@@ -19,7 +18,7 @@ object Simulation {
       generateRandomLatitude(),
       persons,
       surrounding,
-      new Date()
+      Timestamp.from(new Date().toInstant)
     )
   }
 
@@ -69,7 +68,7 @@ object Simulation {
     (Person(personName._1, personName._2, tuple._2), tuple._1)
   }
 
-  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date) extends Product with Serializable
+  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Timestamp) extends Product with Serializable
 
   case class Person(firstname: String, lastname: String, harmonyscore: Int) extends Product with Serializable{
     override def toString: String = {
