@@ -2,7 +2,7 @@ name := "Alert Stream Consumer"
 
 version := "1.0"
 
-scalaVersion := "2.11.12"
+scalaVersion := "2.12.10"
 
 libraryDependencies ++= Seq(
   "org.apache.kafka" % "kafka-clients" % "3.5.0",

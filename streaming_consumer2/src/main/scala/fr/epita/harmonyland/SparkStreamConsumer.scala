@@ -5,7 +5,7 @@ import com.datastax.spark.connector.types.TupleType
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.cassandra.DataFrameWriterWrapper
 import org.apache.spark.sql.functions.{col, collect_list, explode, from_json, struct, typedLit, udf}
-import org.apache.spark.sql.{Encoders, Row, SparkSession}
+import org.apache.spark.sql.{Dataset, Encoders, Row, SparkSession}
 
 import java.sql.Date
 
@@ -45,7 +45,7 @@ object SparkStreamConsumer{
       .select("droneid", "longitude", "latitude", "persons", "words", "time")
 
     val reportQuery = reportDataFrame.writeStream
-      .foreachBatch { (batchDF, _) =>
+      .foreachBatch { (batchDF : Dataset[Row], batchId : Long ) =>
         batchDF.write
           .cassandraFormat("report", "harmonystate")
           .mode("append")
