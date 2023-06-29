@@ -29,5 +29,19 @@ CREATE TABLE IF NOT EXISTS harmonyscores (
     PRIMARY KEY (time)
 );
 
+CREATE TABLE IF NOT EXISTS persons (
+    time timestamp,
+    count int,
+    id uuid,
+    PRIMARY KEY (time)
+);
+
+CREATE TABLE IF NOT EXISTS badpersons (
+    time timestamp,
+    count int,
+    id uuid,
+    PRIMARY KEY (time)
+);
+
 //CREATE ROLE IF NOT EXISTS grafana WITH SUPERUSER = true AND LOGIN = true AND PASSWORD = 'bacon';
 
