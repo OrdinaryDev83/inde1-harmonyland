@@ -10,3 +10,7 @@ libraryDependencies ++= Seq(
   "net.liftweb" %% "lift-json" % "3.4.3"
 )
 
+lazy val app = (project in file("app"))
+  .settings(
+    assembly / assemblyJarName := "drone-fatjar-1.0.jar",
+)
