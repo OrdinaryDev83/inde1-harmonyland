@@ -1,10 +1,67 @@
 # inde1-harmonyland
 
+## Authors
+ - Tom Genlis - tom.genlis
+ - Antoine Boutin - antoine.boutin
+ - Bastien Pouessel - bastien.pouessel
+
+Harmonyland, an extraordinary project developed at EPITA as part of our INDE2 program, showcases our expertise in data engineering.
+
+---
+
 ## Versions
- - Scala 2.13.9
+ - Scala 2.12.10
  - sbt 1.8.2
- - Open JDK 11.0.2
- - Spark 2.4.7
+ - Open JDK 1.8.0_302
+ - Spark 2.4.8
+
+---
+
+## How to build the project from scratch
+
+In order to operate seamlessly, the Harmonyland project requires the utilization of OpenJDK 1.8 and Scala 2.12.10.
+The Harmonyland project also relies on a Kafka broker and a Kafka ZooKeeper.
+
+The project is composed of 5 principal components:
+- drone_producer: simulate drone data that are written in a streams (Kafka)
+- kafka_stream: use kafka stream to keep only alert
+- discord_bot: consume the alert topic and send discord alert (Scala only)
+- spark_streaming: consumer the topic and write it by micro-batch in cassandra database
+- batch_processing: perform spark batch processing on the collected data
+
+
+In order to build the different part of the project. It's possible to go in each sbt project and use the following command:
+```
+sbt clean assembly
+```
+
+Than you can run the jar with:
+```
+java -jar target/scala-2.12/<jar name>.jar
+```
+
+or just use `sbt run`
+
+The project can be divided in tree part:
+- *kafka_stream* and *discord_bot*
+- *spark_streaming*
+- *batch_processing*
+
+They can be tested independently but the first parts require **drone_producer**.
+
+To run the Proof of concept a kafka service needs to be up at localhost:9092.
+
+The Cassandra database and grafana can be deployed with
+
+```
+docker-compose up -d // or podman-compose up -d
+```
+
+The cassandra script is available in order to configure all the tables `cqlsh < schema.cql`
+
+Grafana will be up at `localhost:3000`
+
+---
 
 ## Harmony Poc
 The goal is to write a poc demonstrating a working architecture of harmonystate.
