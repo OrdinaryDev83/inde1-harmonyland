@@ -36,16 +36,11 @@ object Simulation {
     val n = scala.util.Random.nextInt(10) + 1
     val tuples = List.fill(n)(scala.util.Random.shuffle(this.words).head)
     // calculate average of the words
-    val average = {
-      val numbers = tuples.collect {
-        case (_, str) if str.matches("-?\\d+(\\.\\d+)?") => str.toDouble
-      }
-      numbers.sum / numbers.length
+    val tuples2 = tuples.collect {
+      case (a, str) if str.matches("-?\\d+(\\.\\d+)?") => (a, str.toInt)
     }
-
-    // return the words and the average
-    // convert tuples ._2 from string to int
-    (tuples.map(x => (x._1, x._2.toInt)), average.toInt)
+    val numbers = tuples2.map(_._2).map(x => x.toDouble)
+    (tuples2, (numbers.sum / numbers.length).toInt)
   }
 
   private def generateSurrounding(words : List[List[(String, Int)]]): List[String] = {
