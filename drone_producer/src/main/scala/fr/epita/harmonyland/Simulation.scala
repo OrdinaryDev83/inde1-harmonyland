@@ -6,7 +6,7 @@ import scala.util.Random
 
 object Simulation {
   def generateReport(droneId: Int): Report = {
-    val n = (scala.util.Random.nextInt(10) + 1)
+    val n = (scala.util.Random.nextInt(3) + 1)
     val personsAndWords = List.fill(n)(generatePersonAndWords())
     val persons = personsAndWords.map(_._1)
     val words = personsAndWords.map(_._2)

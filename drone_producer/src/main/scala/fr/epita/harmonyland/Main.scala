@@ -14,10 +14,11 @@ object Main extends App {
   scheduler.scheduleAtFixedRate(
     () => {
       implicit val formats: DefaultFormats.type = DefaultFormats
-      val json_list = List.range(0, 100)
+      val json_list = List.range(0, 10)
         .map(Simulation.generateReport)
         .map((report) => {
           val json = write(report)
+          print(json)
           json
         })
       KafkaProducerApp.send(producer, json_list)
