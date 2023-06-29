@@ -30,9 +30,9 @@ object Simulation {
     scala.util.Random.nextDouble() * 360 - 180
   }
 
-  private def getARandomWord(harmonyScore : Int) : String = {
+  private def getARandomWord(harmonyScore : Int) : (String, String) = {
     val words = this.words.filter(_._2.toInt == harmonyScore)
-    words(Random.nextInt(words.length))._1
+    words(Random.nextInt(words.length))
   }
 
   def randomHarmonyScore(): Int = {
@@ -47,7 +47,7 @@ object Simulation {
   private def generateWordsAndScore(): (List[(String, Int)], Int) = {
     // get a random number of words
     val n = scala.util.Random.nextInt(10) + 1
-    val tuples = List.fill(n)((getARandomWord(randomHarmonyScore()), ""))
+    val tuples = List.fill(n)(getARandomWord(randomHarmonyScore()))
     // calculate average of the words
     val tuples2 = tuples.collect {
       case (a, str) if str.matches("-?\\d+(\\.\\d+)?") => (a, str.toInt)
