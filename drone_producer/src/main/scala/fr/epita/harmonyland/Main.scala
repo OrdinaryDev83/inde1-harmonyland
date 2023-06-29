@@ -18,7 +18,6 @@ object Main extends App {
         .map(Simulation.generateReport)
         .map((report) => {
           val json = write(report)
-          println(json)
           json
         })
       KafkaProducerApp.send(producer, json_list)
