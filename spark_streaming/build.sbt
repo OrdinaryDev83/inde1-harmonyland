@@ -14,4 +14,10 @@ libraryDependencies ++= Seq(
   "com.datastax.spark" %% "spark-cassandra-connector" % "2.5.2",
 )
 
-assembly / assemblyJarName := "spark-streaming-fatjar-1.0.jar",
+assembly / assemblyJarName := "spark-streaming-fatjar-1.0.jar"
+
+assembly / assemblyMergeStrategy := {
+    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+    case "reference.conf" => MergeStrategy.concat
+    case _ => MergeStrategy.first
+}
