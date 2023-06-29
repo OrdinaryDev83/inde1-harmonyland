@@ -1,18 +1,14 @@
 package fr.epita.harmonyland
 
 import com.datastax.spark.connector.CassandraSparkExtensions
-import com.datastax.spark.connector.types.TupleType
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.cassandra.DataFrameWriterWrapper
-import org.apache.spark.sql.functions.{col, collect_list, explode, from_json, struct, typedLit, udf}
+import org.apache.spark.sql.functions.{col, from_json}
 import org.apache.spark.sql.{Dataset, Encoders, Row, SparkSession}
 
-import java.sql.{Date, Timestamp}
+import java.sql.Timestamp
 
-object SparkStreamConsumer{
-  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Timestamp) extends Product with Serializable
-  case class Person(firstname: String, lastname: String, harmonyscore: Int) extends Product with Serializable
-
+object SparkStreamConsumer {
   def main(args: Array[String]): Unit = {
     val config = new SparkConf()
       .setMaster("local[*]")
@@ -45,7 +41,7 @@ object SparkStreamConsumer{
       .select("droneid", "longitude", "latitude", "persons", "words", "time")
 
     val reportQuery = reportDataFrame.writeStream
-      .foreachBatch { (batchDF : Dataset[Row], batchId : Long ) =>
+      .foreachBatch { (batchDF: Dataset[Row], batchId: Long) =>
         batchDF.write
           .cassandraFormat("report", "harmonystate")
           .mode("append")
@@ -55,4 +51,8 @@ object SparkStreamConsumer{
 
     reportQuery.awaitTermination()
   }
+
+  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Timestamp) extends Product with Serializable
+
+  case class Person(firstname: String, lastname: String, harmonyscore: Int) extends Product with Serializable
 }
