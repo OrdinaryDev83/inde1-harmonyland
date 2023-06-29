@@ -14,3 +14,4 @@ libraryDependencies ++= Seq(
   "com.datastax.spark" %% "spark-cassandra-connector" % "2.5.2",
 )
 
+assembly / assemblyJarName := "spark-streaming-fatjar-1.0.jar",
