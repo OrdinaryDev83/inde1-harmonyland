@@ -67,8 +67,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -169,8 +168,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -233,23 +231,33 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd"
           },
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "opacity",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -260,8 +268,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -280,26 +287,19 @@
       },
       "id": 1,
       "options": {
-        "barRadius": 0,
-        "barWidth": 0.84,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
-        "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "none",
+        "timezone": [
+          "Europe/Paris"
+        ],
         "tooltip": {
           "mode": "single",
           "sort": "none"
-        },
-        "xField": "time",
-        "xTickLabelRotation": -75,
-        "xTickLabelSpacing": 0
+        }
       },
       "targets": [
         {
@@ -321,10 +321,79 @@
         }
       ],
       "title": "Average harmonyscore",
-      "type": "barchart"
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "a30fe70b-9e30-4f70-9e1d-4677d387b603"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.1",
+      "targets": [
+        {
+          "alias": "Count of bad persons",
+          "columnId": "id",
+          "columnTime": "time",
+          "columnValue": "count",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "cad13df4-e58b-4c3e-aec1-0584fd9f55fe"
+          },
+          "datasourceId": 1,
+          "filtering": true,
+          "keyspace": "harmonystate",
+          "queryType": "query",
+          "refId": "A",
+          "table": "badpersons",
+          "valueId": "9d87a7e3-5d71-4469-97a6-2588943d2e4a"
+        }
+      ],
+      "title": "Mean number of bad person",
+      "type": "gauge"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -332,13 +401,13 @@
     "list": []
   },
   "time": {
-    "from": "2023-06-29T14:27:56.597Z",
-    "to": "2023-06-29T15:05:26.597Z"
+    "from": "now-30m",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Harmonyland",
   "uid": "d87b389e-a5c6-4893-829c-5ec5468e891c",
-  "version": 2,
+  "version": 5,
   "weekStart": ""
 }

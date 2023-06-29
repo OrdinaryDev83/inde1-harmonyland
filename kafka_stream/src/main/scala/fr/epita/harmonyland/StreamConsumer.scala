@@ -20,7 +20,7 @@ object StreamConsumer extends App{
   val builder = new StreamsBuilder
   val sources: KStream[String, String] = builder.stream[String, String]("global1")
 
-  val badScorePattern = "\"harmonyscore\":[0|1]"
+  val badScorePattern = "\"harmonyscore\":(0|1)(?![0-9])".r
   val alerts: KStream[String, String] = sources.filter((_, value) => badScorePattern.r.findFirstIn(value).isDefined)
   alerts.to("alert")
 
