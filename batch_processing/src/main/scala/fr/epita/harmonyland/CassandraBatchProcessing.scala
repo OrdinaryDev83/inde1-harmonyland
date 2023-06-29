@@ -5,7 +5,7 @@ import com.datastax.spark.connector._
 import org.apache.spark.SparkConf
 
 object CassandraBatchProcessing {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     // Create a SparkSession
     val config = new SparkConf()
       .setMaster("local[*]")
@@ -18,22 +18,36 @@ object CassandraBatchProcessing {
       .withExtensions(new CassandraSparkExtensions)
       .getOrCreate()
 
-    // Read data from Cassandra
     val df = spark.read
       .format("org.apache.spark.sql.cassandra")
-      .options(Map( "table" -> "person", "keyspace" -> "harmonystate"))
+      .options(Map( "table" -> "report", "keyspace" -> "harmonystate"))
       .load()
-    print(df.show(10))
 
-    // Perform batch processing (transformation)
-    val transformedDF = df // replace with your transformation
+    val explodedDf = DataFrameTransformation.explodePersons(df)
+    val averageScores = DataFrameTransformation.getAverageHarmonyScores(explodedDf)
+    val personPerTime = DataFrameTransformation.personPerTime(explodedDf)
+    val badHarmonyScorePerTime = DataFrameTransformation.badHarmonyPerTime(explodedDf)
+    val repeatOffender = DataFrameTransformation.repeatOffender(explodedDf)
 
-//    // Write data back to Cassandra
-//    transformedDF.write
-//      .format("org.apache.spark.sql.cassandra")
-//      .options(Map( "table" -> "my_output_table", "keyspace" -> "my_keyspace")) // replace with your output table and keyspace
-//      .mode("overwrite")
-//      .save()
+    repeatOffender.show(10)
+
+    averageScores.write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map( "table" -> "harmonyscores", "keyspace" -> "harmonystate"))
+      .mode("append")
+      .save()
+
+    personPerTime.write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "persons", "keyspace" -> "harmonystate"))
+      .mode("append")
+      .save()
+
+    badHarmonyScorePerTime.write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "badpersons", "keyspace" -> "harmonystate"))
+      .mode("append")
+      .save()
 
     spark.stop()
   }
