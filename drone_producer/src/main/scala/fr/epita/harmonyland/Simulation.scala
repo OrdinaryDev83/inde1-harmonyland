@@ -41,10 +41,10 @@ object Simulation {
   def randomHarmonyScore(): Int = {
     val rand = new Random
     val mean = 5.0
-    val stdDev = 1.82
+    val stdDev = 4.68
     val gaussian = rand.nextGaussian() * stdDev + mean // generates a value from normal distribution centered around 5
     val scaled = (gaussian - (-2.5)) / (12.5 - (-2.5)) * 10 // scales it between 0 and 10
-    Math.min(Math.max(scaled, 0), 10).toInt // clips to 0 or 10 if it falls outside the range
+    Math.min(Math.max(scaled, 0), 10).floor.toInt // clips to 0 or 10 if it falls outside the range
   }
 
   private def generateWordsAndScore(): (List[(String, Int)], Int) = {
