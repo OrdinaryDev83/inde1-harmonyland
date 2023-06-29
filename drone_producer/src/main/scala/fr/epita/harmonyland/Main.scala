@@ -12,17 +12,16 @@ object Main extends App {
   private val scheduler = Executors.newScheduledThreadPool(1)
 
   scheduler.scheduleAtFixedRate(
-    new Runnable {
-      override def run(): Unit = {
-        implicit val formats: DefaultFormats.type = DefaultFormats
-        val json_list = List.range(0, 100)
-          .map(Simulation.generateReport)
-          .map((report) => {
-            val json = write(report)
-            json
-          })
-        KafkaProducerApp.send(producer, json_list)
-      }
+    () => {
+      implicit val formats: DefaultFormats.type = DefaultFormats
+      val json_list = List.range(0, 100)
+        .map(Simulation.generateReport)
+        .map((report) => {
+          val json = write(report)
+          println(json)
+          json
+        })
+      KafkaProducerApp.send(producer, json_list)
     },
     0,
     60,
