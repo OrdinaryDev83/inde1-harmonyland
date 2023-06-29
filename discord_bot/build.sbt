@@ -20,3 +20,5 @@ libraryDependencies ++= Seq(
 
 resolvers += "LavaPlayerRepo" at "https://m2.dv8tion.net/releases"
 libraryDependencies += "com.sedmelluq" % "lavaplayer" % "1.3.77"
+
+assembly / assemblyJarName := "discord-bot-fatjar-1.0.jar",
