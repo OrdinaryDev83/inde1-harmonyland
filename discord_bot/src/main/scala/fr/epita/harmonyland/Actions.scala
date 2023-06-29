@@ -10,9 +10,41 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.Properties
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, seqAsJavaListConverter}
 
-object Actions {
-  def sendMessage(cache : MemoryCacheSnapshot, dotenv: Dotenv, client: DiscordClient, message: String): Unit = {
+import net.liftweb.json._
+import java.util.Date
 
+case class Person(firstname: String, lastname: String, harmonyscore: Int)
+case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date)
+
+object Actions {
+  def parseJson(json: String): Report = {
+    // LiftWeb requires you to specify the format of the Date fields in your JSON
+    implicit val formats = new DefaultFormats {
+      override def dateFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    }
+    parse(json).extract[Report]
+  }
+
+  def messageFromReport(report : Report) : String = {
+    def concatPersons(persons : List[Person]) : String = {
+      persons.map(p => s"${p.firstname} ${p.lastname} (${p.harmonyscore})").mkString(", ")
+    }
+    val persons = concatPersons(report.persons)
+    val badScorePersons = concatPersons(report.persons.filter(p => p.harmonyscore < 2))
+    val restPersons = concatPersons(report.persons.filter(p => p.harmonyscore >= 2))
+    val words = report.words.mkString(", ")
+    s"""
+    |:rotating_light: **Alert !**
+    |:small_blue_diamond: Drone : ${report.droneId}
+    |:small_blue_diamond: Position : ${report.longitude}, ${report.latitude}
+    |:small_blue_diamond: Sad persons : $badScorePersons
+    |:small_blue_diamond: In contact with : $restPersons
+    |:small_blue_diamond: Key words : $words
+    |:small_blue_diamond: Date : ${report.time}
+    """.stripMargin
+  }
+
+  def sendMessage(cache : MemoryCacheSnapshot, dotenv: Dotenv, client: DiscordClient, message: String): Unit = {
     val channelId = TextChannelId(dotenv.get("CHANNEL_ID").toLong)
     val createMessageData = CreateMessageData(message)
     val createMessageRequest = CreateMessage(channelId, createMessageData)
@@ -36,7 +68,7 @@ object Actions {
     val records: ConsumerRecords[String, String] = consumer.poll(java.time.Duration.ofSeconds(1))
     records.asScala.foreach(record => {
       val s = s"offset = ${record.offset()}, key = ${record.key()}, value = ${record.value()}"
-      Actions.sendMessage(msg.cache.current, dotenv, client, record.value())
+      Actions.sendMessage(msg.cache.current, dotenv, client, messageFromReport(parseJson(record.value())))
       println(s)
     })
     consumer.commitSync()

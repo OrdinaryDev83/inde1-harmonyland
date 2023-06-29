@@ -15,7 +15,9 @@ libraryDependencies ++= Seq(
   "net.katsstuff" %% "ackcord-core" % "0.18.1", //Low level core API
   "net.katsstuff" %% "ackcord-commands" % "0.18.1", //Low to mid level Commands API
   "net.katsstuff" %% "ackcord-lavaplayer-core" % "0.18.1", //Low level lavaplayer API
-  "org.apache.kafka" % "kafka-clients" % "2.8.0"
+  "org.apache.kafka" % "kafka-clients" % "2.8.0",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.5",
+  "net.liftweb" %% "lift-json" % "3.4.3"
 )
 
 resolvers += "LavaPlayerRepo" at "https://m2.dv8tion.net/releases"
