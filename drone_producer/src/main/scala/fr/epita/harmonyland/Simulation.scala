@@ -1,9 +1,8 @@
 package fr.epita.harmonyland
 
+import java.sql.Timestamp
 import java.util.Date
 import scala.io.Source
-import scala.math.Fractional.Implicits.infixFractionalOps
-import scala.math.Numeric.IntIsIntegral.mkNumericOps
 import scala.util.Random
 
 object Simulation {
@@ -19,7 +18,7 @@ object Simulation {
       generateRandomLatitude(),
       persons,
       surrounding,
-      new Date()
+      Timestamp.from(new Date().toInstant)
     )
   }
 
@@ -36,16 +35,11 @@ object Simulation {
     val n = scala.util.Random.nextInt(10) + 1
     val tuples = List.fill(n)(scala.util.Random.shuffle(this.words).head)
     // calculate average of the words
-    val average = {
-      val numbers = tuples.collect {
-        case (_, str) if str.matches("-?\\d+(\\.\\d+)?") => str.toDouble
-      }
-      numbers.sum / numbers.length
+    val tuples2 = tuples.collect {
+      case (a, str) if str.matches("-?\\d+(\\.\\d+)?") => (a, str.toInt)
     }
-
-    // return the words and the average
-    // convert tuples ._2 from string to int
-    (tuples.map(x => (x._1, x._2.toInt)), average.toInt)
+    val numbers = tuples2.map(_._2).map(x => x.toDouble)
+    (tuples2, (numbers.sum / numbers.length).toInt)
   }
 
   private def generateSurrounding(words : List[List[(String, Int)]]): List[String] = {
@@ -74,7 +68,7 @@ object Simulation {
     (Person(personName._1, personName._2, tuple._2), tuple._1)
   }
 
-  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date) extends Product with Serializable
+  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Timestamp) extends Product with Serializable
 
   case class Person(firstname: String, lastname: String, harmonyscore: Int) extends Product with Serializable{
     override def toString: String = {

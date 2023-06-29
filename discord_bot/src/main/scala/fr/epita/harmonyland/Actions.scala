@@ -29,15 +29,15 @@ object Actions {
     def concatPersons(persons : List[Person]) : String = {
       persons.map(p => s"${p.firstname} ${p.lastname} (${p.harmonyscore})").mkString(", ")
     }
-    val persons = concatPersons(report.persons)
     val badScorePersons = concatPersons(report.persons.filter(p => p.harmonyscore < 2))
     val restPersons = concatPersons(report.persons.filter(p => p.harmonyscore >= 2))
     val words = report.words.mkString(", ")
+    val pluralS = if (badScorePersons.length > 1) "s" else ""
     s"""
     |:rotating_light: **Alert !**
     |:small_blue_diamond: Drone : ${report.droneId}
     |:small_blue_diamond: Position : ${report.longitude}, ${report.latitude}
-    |:small_blue_diamond: Sad persons : $badScorePersons
+    |:small_blue_diamond: Sad person${pluralS} : $badScorePersons
     |:small_blue_diamond: In contact with : $restPersons
     |:small_blue_diamond: Key words : $words
     |:small_blue_diamond: Date : ${report.time}
