@@ -10,3 +10,4 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" %% "kafka-streams-scala" % "2.3.0"
 )
 
+assembly / assemblyJarName := "kafka-stream-fatjar-1.0.jar",
