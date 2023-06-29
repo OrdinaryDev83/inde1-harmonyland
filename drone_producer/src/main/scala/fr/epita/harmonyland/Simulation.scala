@@ -2,6 +2,8 @@ package fr.epita.harmonyland
 
 import java.util.Date
 import scala.io.Source
+import scala.math.Fractional.Implicits.infixFractionalOps
+import scala.math.Numeric.IntIsIntegral.mkNumericOps
 import scala.util.Random
 
 object Simulation {
@@ -29,7 +31,7 @@ object Simulation {
     scala.util.Random.nextDouble() * 360 - 180
   }
 
-  private def generateWordsAndScore(): (List[String], Int) = {
+  private def generateWordsAndScore(): (List[(String, Int)], Int) = {
     // get a random number of words
     val n = scala.util.Random.nextInt(10) + 1
     val tuples = List.fill(n)(scala.util.Random.shuffle(this.words).head)
@@ -42,12 +44,13 @@ object Simulation {
     }
 
     // return the words and the average
-    (tuples.map(_._1), average.toInt)
+    // convert tuples ._2 from string to int
+    (tuples.map(x => (x._1, x._2.toInt)), average.toInt)
   }
 
-  private def generateSurrounding(words : List[List[String]]): List[String] = {
-    // concat all the words said by each person
-    words.flatten
+  private def generateSurrounding(words : List[List[(String, Int)]]): List[String] = {
+    // concat all the words said by each person and sort it by score
+    words.flatten.sortBy(_._2).map(_._1)
   }
 
   private def read_csv(filePath : String) : List[(String, String)] = {
@@ -65,7 +68,7 @@ object Simulation {
   private val names = read_csv("data/names.csv")
   private val words = read_csv("data/words.csv")
 
-  private def generatePersonAndWords(): (Person, List[String]) = {
+  private def generatePersonAndWords(): (Person, List[(String, Int)]) = {
     val personName = Random.shuffle(names).head
     val tuple = generateWordsAndScore()
     (Person(personName._1, personName._2, tuple._2), tuple._1)
