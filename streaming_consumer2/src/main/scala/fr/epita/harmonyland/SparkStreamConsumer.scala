@@ -1,13 +1,18 @@
 package fr.epita.harmonyland
 
 import com.datastax.spark.connector.CassandraSparkExtensions
+import com.datastax.spark.connector.types.TupleType
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.cassandra.DataFrameWriterWrapper
-import org.apache.spark.sql.{Encoders, SparkSession}
+import org.apache.spark.sql.functions.{col, collect_list, explode, from_json, struct, typedLit, udf}
+import org.apache.spark.sql.{Encoders, Row, SparkSession}
 
-import java.util.Date
+import java.sql.Date
 
 object SparkStreamConsumer{
+  case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date) extends Product with Serializable
+  case class Person(firstname: String, lastname: String, harmonyscore: Int) extends Product with Serializable
+
   def main(args: Array[String]): Unit = {
     val config = new SparkConf()
       .setMaster("local[*]")
@@ -25,27 +30,29 @@ object SparkStreamConsumer{
       .format("kafka")
       .option("kafka.bootstrap.servers", "localhost:9092")
       .option("startingOffsets", "earliest")
-      .option("subscribe", "global1")
+      .option("subscribe", "global2")
       .load()
 
-    case class Report(droneId: Int, longitude: Double, latitude: Double, persons: List[Person], words: List[String], time: Date)
-    case class Person(firstName: String, lastName: String, harmonyScore: Int) {
-      override def toString: String = {
-        s"$firstName $lastName: $harmonyScore"
-      }
-    }
+    val reportSchema = Encoders.product[Report].schema
+    val streamDataFrame = df.select(from_json(col("value").cast("string"), reportSchema)
+      .alias("value"))
+      .select("value.*")
+      .withColumnRenamed("droneId", "droneid")
+      .filter(col("droneid").isNotNull)
+      .filter(col("time").isNotNull)
 
-    //val reportSchema = Encoders.product[Report].schema
-    df.select("value")
+    val reportDataFrame = streamDataFrame
+      .select("droneid", "longitude", "latitude", "persons", "words", "time")
 
-    df.writeStream
-      .foreachBatch { (batchDF, batchId) =>
+    val reportQuery = reportDataFrame.writeStream
+      .foreachBatch { (batchDF, _) =>
         batchDF.write
-          .cassandraFormat("person", "harmonystate")
+          .cassandraFormat("report", "harmonystate")
           .mode("append")
           .save()
       }
       .start()
-      .awaitTermination()
+
+    reportQuery.awaitTermination()
   }
 }
